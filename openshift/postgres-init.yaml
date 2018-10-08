@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: sentry-postgres-init-secrets
+  annotations:
+    description: Secrets for Sentry's PosgreSQL
+    version: 0.0.1
+    tags: poc,sentry
+    template.openshift.io/documentation-url: https://github.com/Thoth-Station/
+  labels:
+    app: sentry
+    template: sentry-postgres-init-secrets
+    component: postgres
+
+objects:
+  - kind: Secret
+    apiVersion: v1
+    metadata:
+      name: sentry-postgres-init
+      labels:
+        app: sentry
+        component: postgres
+    stringData:
+      SENTRY_POSTGRES_HOST: "${SENTRY_POSTGRES_HOST}"
+      SENTRY_POSTGRES_PORT: "${SENTRY_POSTGRES_PORT}"
+      SENTRY_DB_NAME: "${SENTRY_POSTGRES_DB_NAME}"
+      SENTRY_DB_USER: "${SENTRY_POSTGRES_ADMIN_USER}"
+      SENTRY_DB_PASSWORD: "${SENTRY_POSTGRES_ADMIN_PASSWORD}"
+      SENTRY_INITIAL_PASSWORD: "${SENTRY_INITIAL_PASSWORD}"
+      SENTRY_INITIAL_EMAIL: "${SENTRY_INITIAL_EMAIL}"
+
+parameters:
+  - description: A host where PostgreSQL instance sits.
+    name: SENTRY_POSTGRES_HOST
+    value: postgres
+    required: true
+
+  - description: A port where PostgreSQL instance listens.
+    name: SENTRY_POSTGRES_PORT
+    value: '5432'
+    required: true
+
+  - description: PostgreSQL database name to be used.
+    name: SENTRY_POSTGRES_DB_NAME
+    value: postgres
+    required: true
+
+  - description: PostgreSQL admin user neeeded for populating database.
+    name: SENTRY_POSTGRES_ADMIN_USER
+    value: postgres
+    required: true
+
+  - description: PostgreSQL admin password needed for populating database.
+    name: SENTRY_POSTGRES_ADMIN_PASSWORD
+    value: postgres
+    required: true
+
+  - description: Password used for initial user account.
+    name: SENTRY_INITIAL_PASSWORD
+    required: true
+
+  - description: E-mail used for initial user account.
+    name: SENTRY_INITIAL_EMAIL
+    required: true

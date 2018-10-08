@@ -378,19 +378,13 @@ objects:
             - sentry
             - run
             - cron
-            env:
-            - name: SENTRY_POSTGRES_HOST
-              valueFrom:
-                 secretKeyRef:
-                   name: sentry-db
-                   key: POSTGRESQL_HOSTNAME
             envFrom:
              - secretRef:
-                 name: sentry-general
+                 name: sentry-postgres
              - secretRef:
-                 name: sentry-github-oauth
+                 name: sentry-redis
              - secretRef:
-                 name: sentry-s3
+                 name: sentry-generic
             image: registry.centos.org/centos/sentry-sso:8.22
             imagePullPolicy: Always
             name: sentry-cron
@@ -436,7 +430,7 @@ objects:
         app: sentry
       name: sentry-web
     spec:
-      replicas: 2
+      replicas: 1
       selector:
         run: sentry-web
       strategy:
@@ -462,24 +456,19 @@ objects:
             app: sentry
         spec:
           containers:
-          - env:
-            - name: SENTRY_POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: sentry-db
-                  key: POSTGRESQL_HOSTNAME
-            - name: SENTRY_USE_SSL
-              value: "true"
+          - name: sentry-web
+            env:
+              - name: SENTRY_USE_SSL
+                value: "true"
             envFrom:
-             - secretRef:
-                 name: sentry-general
-             - secretRef:
-                 name: sentry-github-oauth
-             - secretRef:
-                 name: sentry-s3
+              - secretRef:
+                  name: sentry-postgres
+              - secretRef:
+                  name: sentry-redis
+              - secretRef:
+                  name: sentry-generic
             image: registry.centos.org/centos/sentry-sso:8.22
             imagePullPolicy: Always
-            name: sentry-web
             ports:
             - containerPort: 9000
               protocol: TCP
@@ -556,29 +545,24 @@ objects:
             - run
             - worker
             env:
-            - name: SENTRY_POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: sentry-db
-                  key: POSTGRESQL_HOSTNAME
             - name: C_FORCE_ROOT
               value: "TRUE"
             envFrom:
              - secretRef:
-                 name: sentry-general
+                 name: sentry-postgres
              - secretRef:
-                 name: sentry-github-oauth
+                 name: sentry-redis
              - secretRef:
-                 name: sentry-s3
+                 name: sentry-generic
             image: registry.centos.org/centos/sentry-sso:8.22
             imagePullPolicy: Always
             name: sentry-worker
             resources:
               requests:
-                memory: "256Mi"
+                memory: "512Mi"
                 cpu: "500m"
               limits:
-                memory: "256Mi"
+                memory: "512Mi"
                 cpu: "500m"
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
@@ -625,3 +609,14 @@ objects:
       type: ClusterIP
     status:
       loadBalancer: {}
+  - kind: Route
+    apiVersion: v1
+    metadata:
+      name: sentry
+      labels:
+        app: sentry
+        component: sentry-web
+    spec:
+      to:
+        kind: Service
+        name: sentry

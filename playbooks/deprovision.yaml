@@ -12,4 +12,4 @@
 
   - name: Deprovision Sentry
     command: "oc delete template,dc,configmap,service,imagestreamtag,is,route,\
-      secret,svc,sa --selector 'app=sentry'"
+      secret,svc,sa,jobs --selector 'app=sentry'"

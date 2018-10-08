@@ -11,8 +11,39 @@
     command: "oc project {{ SENTRY_NAMESPACE }}"
     register: project_exists
 
+  - name: Provision PostgreSQL secrets
+    shell:
+      oc process -f ../openshift/postgres-secrets.yaml
+      -p SENTRY_POSTGRES_HOST="{{ SENTRY_POSTGRES_HOST }}"
+      -p SENTRY_POSTGRES_PORT="{{ SENTRY_POSTGRES_PORT }}"
+      -p SENTRY_POSTGRES_DB_NAME="{{ SENTRY_POSTGRES_DB_NAME }}"
+      -p SENTRY_POSTGRES_DB_USER="{{ SENTRY_POSTGRES_DB_USER }}"
+      -p SENTRY_POSTGRES_DB_PASSWORD="{{ SENTRY_POSTGRES_DB_PASSWORD }}" | oc apply -f -
+
+  - name: Provision PostgreSQL secrets for initial setup
+    shell:
+      oc process -f ../openshift/postgres-init.yaml
+      -p SENTRY_POSTGRES_HOST="{{ SENTRY_POSTGRES_HOST }}"
+      -p SENTRY_POSTGRES_PORT="{{ SENTRY_POSTGRES_PORT }}"
+      -p SENTRY_POSTGRES_DB_NAME="{{ SENTRY_POSTGRES_DB_NAME }}"
+      -p SENTRY_POSTGRES_ADMIN_USER="{{ SENTRY_POSTGRES_ADMIN_USER }}"
+      -p SENTRY_POSTGRES_ADMIN_PASSWORD="{{ SENTRY_POSTGRES_ADMIN_PASSWORD }}"
+      -p SENTRY_INITIAL_PASSWORD="{{ SENTRY_INITIAL_PASSWORD }}"
+      -p SENTRY_INITIAL_EMAIL="{{ SENTRY_INITIAL_EMAIL }}" | oc apply -f -
+
+  - name: Provision Redis secrets
+    shell: >
+      oc process -f ../openshift/redis-secrets.yaml
+      -p SENTRY_REDIS_HOST="{{ SENTRY_REDIS_HOST }}"
+      -p SENTRY_REDIS_PORT="{{ SENTRY_REDIS_PORT }}"
+      -p SENTRY_REDIS_PASSWORD="{{ SENTRY_REDIS_PASSWORD }}"
+      -p SENTRY_REDIS_DB="{{ SENTRY_REDIS_DB  }}" | oc apply -f -
+
+  - name: Provision Sentry secrets
+    shell: oc process -f ../openshift/sentry-secrets.yaml | oc apply -f -
+
   - name: Provision Sentry
     shell: oc process -f ../openshift/sentry.yaml | oc apply -f -
 
   - name: Create database populator job
-    shell: oc process -f ../openshift/init-db.yaml | oc apply -f -
+    shell: oc process -f ../openshift/database-populator.yaml | oc apply -f -

@@ -8,6 +8,24 @@
     openshift_master_url: "{{ lookup('env','OCP_URL') }}"
     token: "{{ lookup('env','OCP_TOKEN') }}"
     SENTRY_NAMESPACE: "{{ lookup('env', 'SENTRY_NAMESPACE') }}"
+    # PostgreSQL configuration.
+    SENTRY_POSTGRES_HOST: "postgresql"
+    SENTRY_POSTGRES_PORT: "5432"
+    # Now the credentials are same, the account cannot connect to the database
+    # after the initial database population was done.
+    SENTRY_POSTGRES_DB_NAME: "redis"
+    SENTRY_POSTGRES_DB_USER: "postgres"
+    SENTRY_POSTGRES_DB_PASSWORD: "postgres"
+    SENTRY_POSTGRES_ADMIN_USER: "postgres"
+    SENTRY_POSTGRES_ADMIN_PASSWORD: "postgres"
+    # Redis configuration.
+    SENTRY_REDIS_HOST: "redis"
+    SENTRY_REDIS_PORT: "6379"
+    SENTRY_REDIS_PASSWORD: ""
+    SENTRY_REDIS_DB: "0"
+    # Initial account configuration.
+    SENTRY_INITIAL_PASSWORD: '123456'
+    SENTRY_INITIAL_EMAIL: 'noreply@redhat.com'
 
   gather_facts: false
   connection: local

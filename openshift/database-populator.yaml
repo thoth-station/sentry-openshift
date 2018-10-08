@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: postgres-deploymentconfig
+  template: sentry-database-populator
   app: sentry
 metadata:
-  name: postgres-deploymentconfig
+  name: sentry-database-populator
   annotations:
-    description: Selinon PostgreSQL
-    openshift.io/display-name: PostgreSQL
+    description: A database populator for Sentry
+    openshift.io/display-name: A database populator for Sentry
     version: 1.0.0
 objects:
 - kind: Job
   apiVersion: batch/v1
   metadata:
     # Initializes database with Sentry data and creates initial user
-    name: database-populator
+    name: sentry-database-populator
   spec:
     template:
       spec:
@@ -29,17 +29,13 @@ objects:
               requests:
                 cpu: 50m
                 memory: 800Mi
-            env:
-              - name: SENTRY_POSTGRES_HOST
-                valueFrom:
-                  secretKeyRef:
-                    name: sentry-db
-                    key: POSTGRESQL_HOSTNAME
             envFrom:
              - secretRef:
-                 name: sentry-general
+                 name: sentry-redis
              - secretRef:
-                 name: sentry-init
+                 name: sentry-generic
+             - secretRef:
+                 name: sentry-postgres-init
             volumeMounts:
               - name: config-volume
                 mountPath: /etc/sentry/

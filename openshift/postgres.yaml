@@ -6,7 +6,7 @@ labels:
 metadata:
   name: postgres-deploymentconfig
   annotations:
-    description: Selinon PostgreSQL
+    description: PostgreSQL deployment
     openshift.io/display-name: PostgreSQL
     version: 1.0.0
 objects:
@@ -17,7 +17,7 @@ objects:
       service: postgres
       component: postgres
       app: sentry
-    name: postgres
+    name: postgres-sentry
   spec:
     ports:
     - port: 5432
@@ -33,7 +33,7 @@ objects:
       service: postgres
       component: postgres
       app: sentry
-    name: postgres
+    name: postgres-sentry
   spec:
     replicas: 1
     selector:

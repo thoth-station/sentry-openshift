@@ -116,7 +116,7 @@ objects:
     metadata:
       annotations:
         # Change storage class for your deployment if needed.
-        volume.beta.kubernetes.io/storage-class: ceph-dyn-datahub-paas
+        # volume.beta.kubernetes.io/storage-class: ceph-dyn-datahub-paas
       name: sentry-redis-pvc
     spec:
       accessModes:
