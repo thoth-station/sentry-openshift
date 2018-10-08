@@ -1,0 +1,15 @@
+---
+- name: Playbook to provision Sentry onto OpenShift
+    - openshift
+    - thoth
+
+  hosts: localhost
+  vars:
+    openshift_master_url: "{{ lookup('env','OCP_URL') }}"
+    token: "{{ lookup('env','OCP_TOKEN') }}"
+    SENTRY_NAMESPACE: "{{ lookup('env', 'SENTRY_NAMESPACE') }}"
+
+  gather_facts: false
+  connection: local
+  roles:
+  - role: sentry

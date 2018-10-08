@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: postgres-deploymentconfig
+  app: sentry
+metadata:
+  name: postgres-deploymentconfig
+  annotations:
+    description: Selinon PostgreSQL
+    openshift.io/display-name: PostgreSQL
+    version: 1.0.0
+objects:
+- kind: Job
+  apiVersion: batch/v1
+  metadata:
+    # Initializes database with Sentry data and creates initial user
+    name: database-populator
+  spec:
+    template:
+      spec:
+        containers:
+          - name: database-populator
+            image: registry.centos.org/centos/sentry-sso:8.22
+            resources:
+              limits:
+                # for some reason this populator is consuming lots of memory
+                cpu: 500m
+                memory: 1500Mi
+              requests:
+                cpu: 50m
+                memory: 800Mi
+            env:
+              - name: SENTRY_POSTGRES_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: sentry-db
+                    key: POSTGRESQL_HOSTNAME
+            envFrom:
+             - secretRef:
+                 name: sentry-general
+             - secretRef:
+                 name: sentry-init
+            volumeMounts:
+              - name: config-volume
+                mountPath: /etc/sentry/
+            command:
+                - "/bin/bash"
+                - "-ecx"
+                - |
+                  # Init migrations
+                  sentry upgrade --noinput
+                  # Create user to sentry
+                  sentry createuser --email ${SENTRY_INITIAL_EMAIL} --password ${SENTRY_INITIAL_PASSWORD} --superuser --no-input
+            imagePullPolicy: Always
+        volumes:
+        - name: config-volume
+          configMap:
+            name: sentry
+        restartPolicy: OnFailure
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst

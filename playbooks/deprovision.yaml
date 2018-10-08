@@ -1,0 +1,15 @@
+---
+- name: Playbook to deprovision Sentry
+
+  hosts: localhost
+
+  gather_facts: false
+  connection: local
+
+  tasks:
+  - fail: msg="Bailing out. this play requires 'SENTRY_NAMESPACE'"
+    when: SENTRY_NAMESPACE is not defined
+
+  - name: Deprovision Sentry
+    command: "oc delete template,dc,configmap,service,imagestreamtag,is,route,\
+      secret,svc,sa --selector 'app=sentry'"
