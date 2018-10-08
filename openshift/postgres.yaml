@@ -9,7 +9,6 @@ metadata:
     description: Selinon PostgreSQL
     openshift.io/display-name: PostgreSQL
     version: 1.0.0
-
 objects:
 - kind: Service
   apiVersion: v1
@@ -90,8 +89,8 @@ objects:
               name: postgres-volume
         volumes:
         - name: postgres-volume
-          emptyDir: {}
-
+          persistentVolumeClaim:
+            claimName: sentry-postgresql-pvc
     test: false
     triggers:
     - type: ConfigChange

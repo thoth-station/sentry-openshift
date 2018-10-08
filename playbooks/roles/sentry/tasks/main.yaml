@@ -1,0 +1,21 @@
+---
+  - name: login to OpenShift using provided token
+    command: "oc login --insecure-skip-tls-verify=true --token {{ token }} {{ openshift_master_url }}"
+    changed_when: False
+    
+  - name: "create Sentry namespace"
+    command: "oc new-project {{ SENTRY_NAMESPACE }}"
+    ignore_errors: true
+
+  - name: "make sure to use project {{ SENTRY_NAMESPACE }}"
+    command: "oc project {{ SENTRY_NAMESPACE }}"
+    register: project_exists
+
+  - name: Provison PostgreSQL for Sentry
+    shell: oc process -f ../openshift/postgres.yaml | oc apply -f -
+
+  - name: Provison Sentry
+    shell: oc process -f ../openshift/sentry.yaml | oc apply -f -
+
+  - name: Create database populator job
+    shell: oc process -f ../openshift/init-db.yaml | oc apply -f -
