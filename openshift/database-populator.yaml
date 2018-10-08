@@ -46,7 +46,7 @@ objects:
                   # Init migrations
                   sentry upgrade --noinput
                   # Create user to sentry
-                  sentry createuser --email ${SENTRY_INITIAL_EMAIL} --password ${SENTRY_INITIAL_PASSWORD} --superuser --no-input
+                  sentry createuser --email "${SENTRY_INITIAL_EMAIL}" --password "${SENTRY_INITIAL_PASSWORD}" --superuser --no-input
             imagePullPolicy: Always
         volumes:
         - name: config-volume

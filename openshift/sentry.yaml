@@ -620,3 +620,5 @@ objects:
       to:
         kind: Service
         name: sentry
+      tls:
+        termination: edge

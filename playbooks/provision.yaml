@@ -9,11 +9,11 @@
     token: "{{ lookup('env','OCP_TOKEN') }}"
     SENTRY_NAMESPACE: "{{ lookup('env', 'SENTRY_NAMESPACE') }}"
     # PostgreSQL configuration.
-    SENTRY_POSTGRES_HOST: "postgresql"
+    SENTRY_POSTGRES_HOST: "postgres"
     SENTRY_POSTGRES_PORT: "5432"
     # Now the credentials are same, the account cannot connect to the database
     # after the initial database population was done.
-    SENTRY_POSTGRES_DB_NAME: "redis"
+    SENTRY_POSTGRES_DB_NAME: "postgres"
     SENTRY_POSTGRES_DB_USER: "postgres"
     SENTRY_POSTGRES_DB_PASSWORD: "postgres"
     SENTRY_POSTGRES_ADMIN_USER: "postgres"
@@ -24,8 +24,12 @@
     SENTRY_REDIS_PASSWORD: ""
     SENTRY_REDIS_DB: "0"
     # Initial account configuration.
-    SENTRY_INITIAL_PASSWORD: '123456'
-    SENTRY_INITIAL_EMAIL: 'noreply@redhat.com'
+    SENTRY_INITIAL_PASSWORD: "123456"
+    SENTRY_INITIAL_EMAIL: "noreply@redhat.com"
+    # Configuration for GitHub integration:
+    #   https://github.com/getsentry/sentry-plugins#github
+    GITHUB_APP_ID: ""
+    GITHUB_API_SECRET: ""
 
   gather_facts: false
   connection: local
