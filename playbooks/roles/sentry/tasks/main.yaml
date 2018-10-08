@@ -11,10 +11,7 @@
     command: "oc project {{ SENTRY_NAMESPACE }}"
     register: project_exists
 
-  - name: Provison PostgreSQL for Sentry
-    shell: oc process -f ../openshift/postgres.yaml | oc apply -f -
-
-  - name: Provison Sentry
+  - name: Provision Sentry
     shell: oc process -f ../openshift/sentry.yaml | oc apply -f -
 
   - name: Create database populator job

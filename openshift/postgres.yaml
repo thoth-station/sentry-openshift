@@ -45,52 +45,40 @@ objects:
           app: sentry
       spec:
         containers:
-        - env:
-          - name: POSTGRESQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sentry
-                key: postgres-password
-          - name: POSTGRESQL_USER
-            valueFrom:
-              configMapKeyRef:
-                name: sentry
-                key: postgres-user
-          - name: POSTGRESQL_DATABASE
-            valueFrom:
-              configMapKeyRef:
-                name: sentry
-                key: postgres-database
-          name: postgres
-          ports:
-            - containerPort: 5432
-              protocol: TCP
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "500m"
-            limits:
-              memory: "512Mi"
-              cpu: "750m"
-          readinessProbe:
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 5
-            periodSeconds: 60
-            timeoutSeconds: 10
-          volumeMounts:
-            - mountPath: /var/lib/pgsql/data
-              name: postgres-volume
+          - name: postgres
+            envFrom:
+             - secretRef:
+                 name: sentry-postgres
+            ports:
+              - containerPort: 5432
+                protocol: TCP
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "500m"
+              limits:
+                memory: "512Mi"
+                cpu: "750m"
+            readinessProbe:
+              tcpSocket:
+                port: 5432
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 10
+            livenessProbe:
+              tcpSocket:
+                port: 5432
+              initialDelaySeconds: 5
+              periodSeconds: 60
+              timeoutSeconds: 10
+            volumeMounts:
+              - mountPath: /var/lib/pgsql/data
+                name: postgres-volume
         volumes:
         - name: postgres-volume
-          persistentVolumeClaim:
-            claimName: sentry-postgresql-pvc
+          emptyDir: {}
+          #persistentVolumeClaim:
+          #  claimName: sentry-postgresql-pvc
     test: false
     triggers:
     - type: ConfigChange
